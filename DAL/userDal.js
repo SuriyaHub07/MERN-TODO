@@ -3,4 +3,12 @@ import appConfig from "../config.js/config.js";
 
 const selectDal = mogoDal;
 
-export const {findUserByName,registerUser,addTask,getTask} =selectDal;
+export const 
+{ 
+    findUserByName,
+    registerUser,
+    addTask,
+    getTask,
+    updateTask
+
+} =selectDal;

@@ -18,3 +18,7 @@ export const getTask =(userid)=>{
  return TaskModel.find({user:userid});
 }
 
+export const updateTask = (id,updateTask)=>{
+  return TaskModel.findByIdAndUpdate(id,updateTask,{new:true});
+}
+

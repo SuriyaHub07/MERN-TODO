@@ -1,4 +1,4 @@
-import {taskService,getservice} from "../services/taskServices.js"
+import {taskService,getservice,updateService} from "../services/taskServices.js"
 
 
 export const taskController = async(req,res)=>{
@@ -31,5 +31,26 @@ export const getController = async(req,res)=>{
         res.status(400).json({Error:err.message});
     }
 
+
+}
+
+
+export const updateController = async(req,res)=>{
+    console.log("user",req.user)
+    console.log("body",req.body)
+ try{ 
+    const upd = 
+    {
+        user:req.user.id,
+        todo:req.body.todo,
+        status:req.body.status
+    }
+    const val = await updateService(req.params.id,upd);
+    res.status(200).json(val);
+}
+catch(err){
+    console.log(err);
+    res.status(400).json({error:err.message});
+}
 
 }
