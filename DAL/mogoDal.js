@@ -10,6 +10,10 @@ export const registerUser = (userdata)=>{
     return UserModel.create(userdata);
 }
 
+export const findById = async(id)=>{
+  return TaskModel.findById(id);
+}
+
 export const addTask = (taskdata)=>{
   return TaskModel.create(taskdata)
 }

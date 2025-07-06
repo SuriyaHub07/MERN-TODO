@@ -1,0 +1,124 @@
+From ce334a442e529ae2241906c870bbe2025d78b167 Mon Sep 17 00:00:00 2001
+From: SuriyaHub07 <suriyasep2797@gmail.com>
+Date: Sun, 6 Jul 2025 13:07:30 +0530
+Subject: [PATCH 3/3] Update Task
+
+---
+ DAL/mogoDal.js               |  4 ++++
+ DAL/userDal.js               | 10 +++++++++-
+ Routes/taskRoutes.js         |  3 ++-
+ controller/taskController.js | 23 ++++++++++++++++++++++-
+ services/taskServices.js     |  6 +++++-
+ 5 files changed, 42 insertions(+), 4 deletions(-)
+
+diff --git a/DAL/mogoDal.js b/DAL/mogoDal.js
+index 10d21ab..7acff14 100644
+--- a/DAL/mogoDal.js
++++ b/DAL/mogoDal.js
+@@ -18,3 +18,7 @@ export const getTask =(userid)=>{
+  return TaskModel.find({user:userid});
+ }
+ 
++export const updateTask = (id,updateTask)=>{
++  return TaskModel.findByIdAndUpdate(id,updateTask,{new:true});
++}
++
+diff --git a/DAL/userDal.js b/DAL/userDal.js
+index 4b38c71..0e03927 100644
+--- a/DAL/userDal.js
++++ b/DAL/userDal.js
+@@ -3,4 +3,12 @@ import appConfig from "../config.js/config.js";
+ 
+ const selectDal = mogoDal;
+ 
+-export const {findUserByName,registerUser,addTask,getTask} =selectDal;
+\ No newline at end of file
++export const 
++{ 
++    findUserByName,
++    registerUser,
++    addTask,
++    getTask,
++    updateTask
++
++} =selectDal;
+\ No newline at end of file
+diff --git a/Routes/taskRoutes.js b/Routes/taskRoutes.js
+index afc2d51..e649e5a 100644
+--- a/Routes/taskRoutes.js
++++ b/Routes/taskRoutes.js
+@@ -1,5 +1,5 @@
+ import exp from  "express";
+-import {taskController,getController} from "../controller/taskController.js"
++import {taskController,getController,updateController} from "../controller/taskController.js"
+ import  authenticate from "../middleware/usermiddleware.js"
+ 
+ const router = exp.Router();
+@@ -9,6 +9,7 @@ const router = exp.Router();
+ router.use(authenticate);
+ router.post("/add",taskController);
+ router.get("/get",getController);
++router.put("/update/:id",updateController)
+ 
+ 
+ 
+diff --git a/controller/taskController.js b/controller/taskController.js
+index 9a380b3..988140e 100644
+--- a/controller/taskController.js
++++ b/controller/taskController.js
+@@ -1,4 +1,4 @@
+-import {taskService,getservice} from "../services/taskServices.js"
++import {taskService,getservice,updateService} from "../services/taskServices.js"
+ 
+ 
+ export const taskController = async(req,res)=>{
+@@ -32,4 +32,25 @@ export const getController = async(req,res)=>{
+     }
+ 
+ 
++}
++
++
++export const updateController = async(req,res)=>{
++    console.log("user",req.user)
++    console.log("body",req.body)
++ try{ 
++    const upd = 
++    {
++        user:req.user.id,
++        todo:req.body.todo,
++        status:req.body.status
++    }
++    const val = await updateService(req.params.id,upd);
++    res.status(200).json(val);
++}
++catch(err){
++    console.log(err);
++    res.status(400).json({error:err.message});
++}
++
+ }
+\ No newline at end of file
+diff --git a/services/taskServices.js b/services/taskServices.js
+index 4358227..bf9fd78 100644
+--- a/services/taskServices.js
++++ b/services/taskServices.js
+@@ -1,4 +1,4 @@
+-import {addTask,getTask} from  "../DAL/userDal.js"
++import {addTask,getTask,updateTask} from  "../DAL/userDal.js"
+ 
+ 
+ 
+@@ -8,4 +8,8 @@ export const taskService= async(taskData)=>{
+ 
+ export const getservice = async(getData)=>{
+     return  await getTask(getData);
++}
++
++export const updateService = async(userid,taskdata)=>{
++   return await updateTask(userid,taskdata);
+ }
+\ No newline at end of file
+-- 
+2.49.0.windows.1
+

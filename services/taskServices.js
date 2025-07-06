@@ -1,4 +1,4 @@
-import {addTask,getTask,updateTask} from  "../DAL/userDal.js"
+import {addTask,getTask,updateTask,findById} from  "../DAL/userDal.js"
 
 
 
@@ -11,5 +11,10 @@ export const getservice = async(getData)=>{
 }
 
 export const updateService = async(userid,taskdata)=>{
+    let task = await findById(userid);
+    console.log("task",task)
+    if(task._id.toString() != userid){
+        throw new Error("ivalid user");
+    }
    return await updateTask(userid,taskdata);
 }

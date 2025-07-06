@@ -1,0 +1,277 @@
+From dc252afdf9abf28c2f310bf568bc772d5c7a66e4 Mon Sep 17 00:00:00 2001
+From: SuriyaHub07 <suriyasep2797@gmail.com>
+Date: Sun, 6 Jul 2025 11:57:01 +0530
+Subject: [PATCH 2/3] new features Add and Get todo
+
+---
+ .vscode/launch.json          | 15 +++++++++++++
+ DAL/mogoDal.js               | 13 ++++++++----
+ DAL/userDal.js               |  2 +-
+ Routes/taskRoutes.js         | 18 +++++++++++-----
+ app.js                       |  6 +++---
+ controller/taskController.js | 41 +++++++++++++++++++++++++-----------
+ middleware/usermiddleware.js | 32 ++++++++++++++++++++++++++++
+ mode/taskSchema.js           | 14 ++++++------
+ package.json                 |  2 +-
+ services/taskServices.js     |  8 +++++--
+ 10 files changed, 117 insertions(+), 34 deletions(-)
+ create mode 100644 .vscode/launch.json
+ create mode 100644 middleware/usermiddleware.js
+
+diff --git a/.vscode/launch.json b/.vscode/launch.json
+new file mode 100644
+index 0000000..2ba986f
+--- /dev/null
++++ b/.vscode/launch.json
+@@ -0,0 +1,15 @@
++{
++    // Use IntelliSense to learn about possible attributes.
++    // Hover to view descriptions of existing attributes.
++    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
++    "version": "0.2.0",
++    "configurations": [
++        {
++            "type": "chrome",
++            "request": "launch",
++            "name": "Launch Chrome against localhost",
++            "url": "http://localhost:8080",
++            "webRoot": "${workspaceFolder}"
++        }
++    ]
++}
+\ No newline at end of file
+diff --git a/DAL/mogoDal.js b/DAL/mogoDal.js
+index ba24bbf..10d21ab 100644
+--- a/DAL/mogoDal.js
++++ b/DAL/mogoDal.js
+@@ -1,5 +1,5 @@
+ import {UserModel} from "../mode/userSchema.js"
+-import {TaskModel} from "../mode/taskSchema.js"
++import TaskModel from "../mode/taskSchema.js"
+ 
+ export const  findUserByName= (userName)=>{
+   return UserModel.findOne({userName})
+@@ -10,6 +10,11 @@ export const registerUser = (userdata)=>{
+     return UserModel.create(userdata);
+ }
+ 
+-export const addTask =(taskData)=>{
+-  return TaskModel.create(taskData)
+-}
+\ No newline at end of file
++export const addTask = (taskdata)=>{
++  return TaskModel.create(taskdata)
++}
++
++export const getTask =(userid)=>{
++ return TaskModel.find({user:userid});
++}
++
+diff --git a/DAL/userDal.js b/DAL/userDal.js
+index 6dd3b18..4b38c71 100644
+--- a/DAL/userDal.js
++++ b/DAL/userDal.js
+@@ -3,4 +3,4 @@ import appConfig from "../config.js/config.js";
+ 
+ const selectDal = mogoDal;
+ 
+-export const {findUserByName,registerUser,addTask} =selectDal;
+\ No newline at end of file
++export const {findUserByName,registerUser,addTask,getTask} =selectDal;
+\ No newline at end of file
+diff --git a/Routes/taskRoutes.js b/Routes/taskRoutes.js
+index 61fc26e..afc2d51 100644
+--- a/Routes/taskRoutes.js
++++ b/Routes/taskRoutes.js
+@@ -1,9 +1,17 @@
+-import exp from "express";
+-import {addController} from "../controller/taskController.js"
++import exp from  "express";
++import {taskController,getController} from "../controller/taskController.js"
++import  authenticate from "../middleware/usermiddleware.js"
+ 
+-const router =exp.Router()
++const router = exp.Router();
+ 
+ 
+-router.post("/add",addController)
+ 
+-export default router;
+\ No newline at end of file
++router.use(authenticate);
++router.post("/add",taskController);
++router.get("/get",getController);
++
++
++
++
++export default router;
++
+diff --git a/app.js b/app.js
+index 4968834..14995ae 100644
+--- a/app.js
++++ b/app.js
+@@ -4,9 +4,9 @@ import connectToMongooDB from "./db/mongoo.js";
+ import userRoutes from "./Routes/userRoutes.js";
+ import  taskRoutes from "./Routes/taskRoutes.js";
+ const app = exp();
+- app.use(exp.json())
+-app.use("/auth",userRoutes)
+-app.use("/auth",taskRoutes)
++app.use(exp.json());
++app.use("/auth",userRoutes);
++app.use("/task",taskRoutes);
+ 
+ const connecttodb = async ()=>{
+     try{
+diff --git a/controller/taskController.js b/controller/taskController.js
+index 88b0f65..9a380b3 100644
+--- a/controller/taskController.js
++++ b/controller/taskController.js
+@@ -1,18 +1,35 @@
++import {taskService,getservice} from "../services/taskServices.js"
+ 
+-export const addController = async(req,res)=>{
++
++export const taskController = async(req,res)=>{
++        try{
++            const taskData = {
++                user:req.user.id,
++                todo:req.body.todo,
++                status:req.body.status,
++            }
++         console.log(taskData)
++         const rel = await taskService(taskData)
++
++        
++       }
++       catch(err){
++         res.status(400).json({error:err.message})
++       }
++}
++
++
++export const getController = async(req,res)=>{
+     try{
+-      const taskData ={
+-        user:req.user.id,
+-        todo:req.user.todo,
+-        status:user.status
+-        }
+-        console.log(taskData);
+-        let addVal = await addService(taskData);
+-        res.status(200).json({msg:"Task add sucesfully"});
++        console.log("user",req.user)
++        const rel = await getservice(req.user.id)
++        console.log(rel);
++        res.status(200).json(rel)
+     }
+     catch(err){
+-        console.log(err);
+-        res.status(400).json({error:err.message})
+-
++        console.log(err)
++        res.status(400).json({Error:err.message});
+     }
++
++
+ }
+\ No newline at end of file
+diff --git a/middleware/usermiddleware.js b/middleware/usermiddleware.js
+new file mode 100644
+index 0000000..94d94ee
+--- /dev/null
++++ b/middleware/usermiddleware.js
+@@ -0,0 +1,32 @@
++import jwt from "jsonwebtoken"
++import appConfig from "../config.js/config.js"
++
++const authenticate = async(req,res,next)=>{
++  //Get the token 
++  const authHeader = req.headers.authorization;
++  console.log(authHeader);
++
++  // check token is exist or not
++   if(!authHeader || !authHeader.startsWith("bearer")){
++    res.status(404).json({message:"invaild Token"});
++   }
++  //take the token using split 
++  try{
++   const token = authHeader.split(" ")[1];
++   const user =jwt.verify(token,appConfig.jwt_key);
++   req.user = user;
++   console.log("middle",user);
++   next()
++  }
++  catch(err){
++    console.log("invaild token");
++    res.status(401).json({error:err.message});
++  }
++
++}
++
++
++
++
++
++export default authenticate;
+\ No newline at end of file
+diff --git a/mode/taskSchema.js b/mode/taskSchema.js
+index f7d4145..5db1162 100644
+--- a/mode/taskSchema.js
++++ b/mode/taskSchema.js
+@@ -1,9 +1,11 @@
+-import mongoose, {model,Schema} from "mongoose"
++import  mongoose,{ Schema,model } from "mongoose";
+ 
+-const taskSchema = new Schema({
+-    todo : {type:String,required:true},
+-    status:{type:String,required:true},
++ const taskSchema = new Schema({
++    todo:{type:String,required:true},
++    status:{type:String,rquired:true},
+     user:{type:mongoose.Schema.Types.ObjectId,ref:"user",required:true},
+-},{timestamps:true});
++},{timestamps:true})
+ 
+-export const TaskModel = model("task",taskSchema);
+\ No newline at end of file
++const TaskModel = model("task",taskSchema);
++
++export default TaskModel;
+\ No newline at end of file
+diff --git a/package.json b/package.json
+index 763eb3c..e5345fb 100644
+--- a/package.json
++++ b/package.json
+@@ -5,7 +5,7 @@
+   "type": "module",
+   "scripts": {
+     "test": "echo \"Error: no test specified\" && exit 1",
+-    "start": "nodemon app.js"
++    "start": "nodemon  app.js"
+   },
+   "keywords": [],
+   "author": "",
+diff --git a/services/taskServices.js b/services/taskServices.js
+index 56c32ff..4358227 100644
+--- a/services/taskServices.js
++++ b/services/taskServices.js
+@@ -1,7 +1,11 @@
+-import {addTask} from  "../DAL/userDal.js"
++import {addTask,getTask} from  "../DAL/userDal.js"
+ 
+ 
+ 
+-export const taskAdded = async(taskData)=>{
++export const taskService= async(taskData)=>{
+     return await addTask(taskData);
++}
++
++export const getservice = async(getData)=>{
++    return  await getTask(getData);
+ }
+\ No newline at end of file
+-- 
+2.49.0.windows.1
+
