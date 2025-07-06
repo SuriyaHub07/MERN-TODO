@@ -1,5 +1,5 @@
 import {UserModel} from "../mode/userSchema.js"
-import {TaskModel} from "../mode/taskSchema.js"
+import TaskModel from "../mode/taskSchema.js"
 
 export const  findUserByName= (userName)=>{
   return UserModel.findOne({userName})
@@ -10,6 +10,11 @@ export const registerUser = (userdata)=>{
     return UserModel.create(userdata);
 }
 
-export const addTask =(taskData)=>{
-  return TaskModel.create(taskData)
+export const addTask = (taskdata)=>{
+  return TaskModel.create(taskdata)
 }
+
+export const getTask =(userid)=>{
+ return TaskModel.find({user:userid});
+}
+

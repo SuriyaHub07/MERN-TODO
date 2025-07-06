@@ -1,9 +1,17 @@
-import exp from "express";
-import {addController} from "../controller/taskController.js"
+import exp from  "express";
+import {taskController,getController} from "../controller/taskController.js"
+import  authenticate from "../middleware/usermiddleware.js"
 
-const router =exp.Router()
+const router = exp.Router();
 
 
-router.post("/add",addController)
+
+router.use(authenticate);
+router.post("/add",taskController);
+router.get("/get",getController);
+
+
+
 
 export default router;
+

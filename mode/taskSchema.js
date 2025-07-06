@@ -1,9 +1,11 @@
-import mongoose, {model,Schema} from "mongoose"
+import  mongoose,{ Schema,model } from "mongoose";
 
-const taskSchema = new Schema({
-    todo : {type:String,required:true},
-    status:{type:String,required:true},
+ const taskSchema = new Schema({
+    todo:{type:String,required:true},
+    status:{type:String,rquired:true},
     user:{type:mongoose.Schema.Types.ObjectId,ref:"user",required:true},
-},{timestamps:true});
+},{timestamps:true})
 
-export const TaskModel = model("task",taskSchema);
+const TaskModel = model("task",taskSchema);
+
+export default TaskModel;

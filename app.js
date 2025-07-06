@@ -4,9 +4,9 @@ import connectToMongooDB from "./db/mongoo.js";
 import userRoutes from "./Routes/userRoutes.js";
 import  taskRoutes from "./Routes/taskRoutes.js";
 const app = exp();
- app.use(exp.json())
-app.use("/auth",userRoutes)
-app.use("/auth",taskRoutes)
+app.use(exp.json());
+app.use("/auth",userRoutes);
+app.use("/task",taskRoutes);
 
 const connecttodb = async ()=>{
     try{
