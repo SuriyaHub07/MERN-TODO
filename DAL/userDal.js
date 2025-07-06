@@ -10,6 +10,7 @@ export const
     findById,
     addTask,
     getTask,
-    updateTask
+    updateTask,
+    deleteTask
 
 } =selectDal;

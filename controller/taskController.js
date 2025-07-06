@@ -1,4 +1,4 @@
-import {taskService,getservice,updateService} from "../services/taskServices.js"
+import {taskService,getservice,updateService,deleteService} from "../services/taskServices.js"
 
 
 export const taskController = async(req,res)=>{
@@ -51,6 +51,19 @@ export const updateController = async(req,res)=>{
 catch(err){
     console.log(err);
     res.status(400).json({error:err.message});
+}
+
+}
+
+export const deleteController = async(req,res)=>{
+     console.log(req.params.id,req.user.id);
+try{
+    const task = await deleteService(req.params.id,req.user.id)
+   
+    res.status(200).json({message:"delete sucessful"});
+}
+catch(err){
+res.status(400).json({error:err.msg});
 }
 
 }
