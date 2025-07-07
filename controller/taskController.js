@@ -60,7 +60,7 @@ export const deleteController = async(req,res)=>{
 try{
     const task = await deleteService(req.params.id,req.user.id)
    
-    res.status(200).json({message:"delete sucessful"});
+    res.status(200).json(task);
 }
 catch(err){
 res.status(400).json({error:err.msg});
