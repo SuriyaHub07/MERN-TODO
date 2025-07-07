@@ -1,6 +1,6 @@
 import {taskService,getservice,updateService,deleteService} from "../services/taskServices.js"
 
-
+//Task controller
 export const taskController = async(req,res)=>{
         try{
             const taskData = {
@@ -17,6 +17,8 @@ export const taskController = async(req,res)=>{
          res.status(400).json({error:err.message})
        }
 }
+
+//GET controller
 
 
 export const getController = async(req,res)=>{
