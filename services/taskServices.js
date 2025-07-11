@@ -3,7 +3,13 @@ import {addTask,getTask,updateTask,findById,deleteTask} from  "../DAL/userDal.js
 
 
 export const taskService= async(taskData)=>{
-    return await addTask(taskData);
+    try{
+    console.log("msssg",taskData)
+    // return await addTask(taskData);
+    }
+    catch(err){
+        console.log(err);
+    }
 }
 
 export const getservice = async(getData)=>{

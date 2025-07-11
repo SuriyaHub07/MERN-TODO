@@ -10,7 +10,7 @@ export const taskController = async(req,res)=>{
             }
          console.log(taskData)
          const rel = await taskService(taskData)
-
+          res.status(200).json({message:"Entering todo data",taskData})
         
        }
        catch(err){

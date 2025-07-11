@@ -7,7 +7,7 @@ const authenticate = async(req,res,next)=>{
   console.log(authHeader);
 
   // check token is exist or not
-   if(!authHeader || !authHeader.startsWith("bearer")){
+   if(!authHeader || !authHeader.startsWith("Bearer")){
     res.status(404).json({message:"invaild Token"});
    }
   //take the token using split 
@@ -15,7 +15,7 @@ const authenticate = async(req,res,next)=>{
    const token = authHeader.split(" ")[1];
    const user =jwt.verify(token,appConfig.jwt_key);
    req.user = user;
-   console.log("middle",user);
+   console.log("Entering middleware",user);
    next()
   }
   catch(err){
